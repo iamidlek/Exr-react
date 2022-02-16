@@ -1,0 +1,11 @@
+{
+  "name": "reactformopt",
+  "version": "1.0.0",
+  "description": "best practice react form with out library",
+  "main": "index.jsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "iamidlek",
+  "license": "ISC"
+}
