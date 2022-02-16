@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "best practice react form with out library",
   "main": "index.jsx",
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ],
   "scripts": {
     "dev": "webpack serve --mode development --open --hot",
     "build": "webpack --mode production",
