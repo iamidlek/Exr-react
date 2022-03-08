@@ -8,6 +8,7 @@ import {
 } from '@react-google-maps/api';
 import Places from './places';
 import Distance from './distance';
+import cluster from 'cluster';
 
 type LatLngLiteralt = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -26,14 +27,31 @@ export default function Map() {
   );
   //
   const [office, setOffice] = useState<LatLngLiteralt>();
+  const [directions, setDirections] = useState<DirectionsResult>();
 
   const onLoad = useCallback((map) => {
     mapRef.current = map;
   }, []);
 
-  const houses = useMemo(() => {
-    return generateHouses(center);
-  }, [center]);
+  const houses = useMemo(() => generateHouses(center), [center]);
+
+  const fetchDirections = (house: LatLngLiteralt) => {
+    if (office) {
+      const service = new google.maps.DirectionsService();
+      service.route(
+        {
+          origin: house,
+          destination: office,
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          if ('OK' === status && result) {
+            setDirections(result);
+          }
+        },
+      );
+    }
+  };
 
   return (
     <div className="container">
@@ -53,6 +71,19 @@ export default function Map() {
           mapContainerClassName="map-container"
           options={options}
           onLoad={onLoad}>
+          {directions && (
+            <DirectionsRenderer
+              directions={directions}
+              options={{
+                polylineOptions: {
+                  zIndex: 50,
+                  strokeColor: '#1976D2',
+                  strokeWeight: 5,
+                },
+              }}
+            />
+          )}
+
           {office && (
             <>
               <Marker
@@ -60,9 +91,20 @@ export default function Map() {
                 icon="https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
               />
 
-              {houses.map((house) => (
-                <Marker key={house.lat} position={house} />
-              ))}
+              <MarkerClusterer>
+                {(cluster) =>
+                  houses.map((house) => (
+                    <Marker
+                      key={house.lat}
+                      position={house}
+                      clusterer={cluster}
+                      onClick={() => {
+                        fetchDirections(house);
+                      }}
+                    />
+                  ))
+                }
+              </MarkerClusterer>
 
               <Circle center={office} radius={15000} options={closeOptions} />
               <Circle center={office} radius={30000} options={middleOptions} />
