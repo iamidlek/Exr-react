@@ -8,7 +8,6 @@ import {
 } from '@react-google-maps/api';
 import Places from './places';
 import Distance from './distance';
-import cluster from 'cluster';
 
 type LatLngLiteralt = google.maps.LatLngLiteral;
 type DirectionsResult = google.maps.DirectionsResult;
@@ -63,6 +62,8 @@ export default function Map() {
             mapRef.current?.panTo(position);
           }}
         />
+        {!office && <p>Enter the address of your office.</p>}
+        {directions && <Distance leg={directions.routes[0].legs[0]} />}
       </div>
       <div className="map">
         <GoogleMap
